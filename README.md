@@ -11,15 +11,23 @@ This project creates a need to connect for client-side data.
 
 ## Features:
 
-- CRUD & logical operation built for client-side Explore Products.
-- CRUD & logical operation built for client-side users.
-- CRUD & logical operation built for client-side customer Reviews.
-- CRUD & logical operation built for client-side Purchase products.
+- CRUD & logical operation built for client-side manage Products.
+- CRUD & logical operation built for client-side manage users.
+- CRUD & logical operation built for client-side manage customer Reviews.
+- CRUD & logical operation built for client-side manage orders & delivery status.
 -
 
 ## Quick Started:
 
 ## Clone This Project To Your Local PC:
+
+## Client Side:
+
+```bash
+git clone https://github.com/programming-hero-web-course-4/niche-website-client-side-sonjoyb7u.git
+```
+
+## Server Side:
 
 ```bash
 git clone https://github.com/programming-hero-web-course-4/niche-website-server-side-sonjoyb7u.git

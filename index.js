@@ -17,6 +17,8 @@ const uri = `mongodb+srv://${process.env.DB_USER}:${process.env.DB_PASSWORD}@clu
 // console.log(uri);
 const client = new MongoClient(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 
+// https://pure-castle-02044.herokuapp.com/
+
 // Initially Check Server Run ...
 app.get('/', (req, res) => {
     res.send("CC Splash Shutter website - Server Running...");
@@ -31,6 +33,7 @@ async function run() {
         const ordersCollection = database.collection("ordersCollection");
         const usersCollection = database.collection("usersCollection");
         const reviewsCollection = database.collection("reviewsCollection");
+        const productWiseReviewsCollection = database.collection("productWiseReviewsCollection");
 
         // console.log("DB connected...");
 
@@ -44,7 +47,7 @@ async function run() {
         app.get('/users', async (req, res) => {
             const query = {};
             const users = await usersCollection.find(query).toArray();
-            console.log(users);
+            // console.log(users);
             res.json(users);
         })
 
@@ -63,11 +66,11 @@ async function run() {
               const options = { upsert: true };
               const updateDoc = { $set: user };
               const result = await usersCollection.updateOne(filter, updateDoc, options);
-            //   res.json(result);
+              res.json(result);
           }
           else {
             const result = await usersCollection.insertOne(user);
-            // res.json(result); 
+            res.json(result); 
           }
 
         });
@@ -103,7 +106,7 @@ async function run() {
                     role: req.body.role,
                 }
             });
-            console.log(result);
+            // console.log(result);
             res.json(result);
         });
 
@@ -115,7 +118,7 @@ async function run() {
             res.json(destroy);
         });
 
-        // ===================================PRODUCT CRUD=======================================
+        // ===================================ADMIN PRODUCT CRUD=======================================
 
         // Products Read GET API ...
         app.get('/products', async (req, res) => {
@@ -128,7 +131,7 @@ async function run() {
         // Product Create POST API ...
         app.post('/products/create', async (req, res) => {
             const formData = req.body;
-            console.log(formData);
+            // console.log(formData);
             const create = await productsCollection.insertOne(formData);
             res.json(create)
         });
@@ -164,7 +167,7 @@ async function run() {
                 }
             };
             const update = await productsCollection.updateOne(filter, updateDoc, options);
-            console.log(update);
+            // console.log(update);
             res.json(update);
         });
 
@@ -176,7 +179,7 @@ async function run() {
             res.json(destroy);
         });
 
-        // Show Product Detail GET API ... 
+        // Show & Read Product Detail GET API ... 
         app.get('/product-detail/:id', async (req, res) => {
             const query = {_id: ObjectId(req.params.id)};
             const product = await productsCollection.findOne(query);
@@ -184,10 +187,40 @@ async function run() {
             res.json(product)
         });
 
-        // ====================================================================================
 
-        // Guest User Order Create POST API ... 
-        app.post('/orders/create', async (req, res) => {
+        // =========================================ADMIN ORDER CRUD================================
+        // Admin User Read All Orders GET API ...
+        app.get("/admins/allOrders", async (req, res) => {
+            const orders = await ordersCollection.find({}).toArray();
+            res.json(orders);
+        });
+
+        // Admin Order Status Changing PUT API ...
+        app.put("/admins/order/status/:id", async (req, res) => {
+            const filter = { _id: ObjectId(req.params.id) };
+            // console.log(req.body.status);
+            const result = await ordersCollection.updateOne(filter, {
+                $set: {
+                    status: req.body.status,
+                }
+            });
+            // console.log(result);
+            res.json(result);
+        });
+
+        // Admin User Delete Order DELETE API ... 
+        app.delete('/admins/allOrder/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const destroy = await ordersCollection.deleteOne(query);
+            res.json(destroy);
+        });
+
+
+        // =========================================GUEST ORDER CRUD================================
+
+        // Guest User Order Create POST API ...
+        app.post('/user/order/create', async (req, res) => {
             const formData = req.body;
             const create = await ordersCollection.insertOne(formData);
             res.json(create);
@@ -195,7 +228,7 @@ async function run() {
 
         // Guest User Read Personal/My Orders GET API ...
         app.get("/user/myOrders/:email", async (req, res) => {
-            console.log(req.params.email);
+            // console.log(req.params.email);
             const email = { email: req.params.email }
             const result = await ordersCollection.find(email).toArray();
             res.json(result);
@@ -210,11 +243,48 @@ async function run() {
         });
 
 
-        // =============================REVIEW CRUD==============================
-        // Guest User Create Review POST API ...
-        app.post('/user/review/create', async (req, res) => {
+        // =============================ADMIN REVIEW CRUD==============================
+
+        // Admin User Read All Reviews GET API ...
+        app.get("/admins/allReviews", async (req, res) => {
+            const reviews = await reviewsCollection.find({}).toArray();
+            res.json(reviews);
+        });
+
+        // Admin Order Status Changing PUT API ...
+        app.put("/admins/review/status/:id", async (req, res) => {
+            const filter = { _id: ObjectId(req.params.id) };
+            // console.log(req.body.display);
+            const result = await reviewsCollection.updateOne(filter, {
+                $set: {
+                    display: req.body.display,
+                }
+            });
+            // // console.log(result);
+            res.json(result);
+        });
+
+        // =============================GUEST REVIEW CRUD==============================
+
+        // Guest User Read Order for Create Product review GET API ...
+        app.get('/user/order/:id', async (req, res) => {
+            const query = {_id: ObjectId(req.params.id)};
+            const order = await ordersCollection.findOne(query);
+            // console.log(order);
+            res.json(order)
+        });
+
+        // Guest User Create Site Review POST API ...
+        app.post('/user/site-review/create', async (req, res) => {
             const formData = req.body;
             const create = await reviewsCollection.insertOne(formData);
+            res.json(create);
+        });
+
+        // Guest User Create Product Wise Review POST API ...
+        app.post('/user/product-review/create', async (req, res) => {
+            const formData = req.body;
+            const create = await productWiseReviewsCollection.insertOne(formData);
             res.json(create);
         });
 
