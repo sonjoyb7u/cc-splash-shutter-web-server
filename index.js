@@ -270,7 +270,7 @@ async function run() {
                     display: req.body.display,
                 }
             });
-            // // console.log(result);
+             // console.log(result);
             res.json(result);
         });
 
