@@ -120,8 +120,8 @@ async function run() {
 
         // ===================================ADMIN PRODUCT CRUD=======================================
 
-        // Products Read GET API ...
-        app.get('/products', async (req, res) => {
+        // Admin User All Products Read GET API ...
+        app.get('/admins/products', async (req, res) => {
             const query = {};
             const products = await productsCollection.find(query).toArray();
             // console.log(products);
@@ -129,7 +129,7 @@ async function run() {
         })
 
         // Product Create POST API ...
-        app.post('/products/create', async (req, res) => {
+        app.post('/admins/product/create', async (req, res) => {
             const formData = req.body;
             // console.log(formData);
             const create = await productsCollection.insertOne(formData);
@@ -137,7 +137,7 @@ async function run() {
         });
 
         // Product Edit GET API ...
-        app.get('/products/edit/:id', async (req, res) => {
+        app.get('/admins/product/edit/:id', async (req, res) => {
             const id = req.params.id;
             const query = {_id: ObjectId(id)}
             const product = await productsCollection.findOne(query);
@@ -146,7 +146,7 @@ async function run() {
         });
 
         // Product Update PUT API ... 
-        app.put('/products/update/:id', async (req, res) => {
+        app.put('/admin/product/update/:id', async (req, res) => {
             const id = req.params.id;
             const editFormData = req.body;
             const filter = {_id: ObjectId(id)};
@@ -172,7 +172,7 @@ async function run() {
         });
 
         // Product Delete DELETE API ...
-        app.delete('/products/delete/:id', async (req, res) => {
+        app.delete('/admins/product/delete/:id', async (req, res) => {
             const id = req.params.id;
             const query = { _id: ObjectId(id) };
             const destroy = await productsCollection.deleteOne(query);
@@ -323,6 +323,24 @@ async function run() {
             const formData = req.body;
             const create = await productWiseReviewsCollection.insertOne(formData);
             res.json(create);
+        });
+
+        // Gust User Read His Product wise Reviews GET API ...
+        app.get("/user/product-review/:email", async (req, res) => {
+            // console.log(req.params.email);
+            const email = { email: req.params.email }
+            const result = await productWiseReviewsCollection.find(email).toArray();
+            if(result) {
+                res.json(result);
+            }
+        });
+
+        // Guest User Delete Product wise Review DELETE API ... 
+        app.delete('/user/product-review/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const destroy = await productWiseReviewsCollection.deleteOne(query);
+            res.json(destroy);
         });
 
 
