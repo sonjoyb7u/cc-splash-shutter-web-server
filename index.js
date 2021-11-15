@@ -62,16 +62,18 @@ async function run() {
         app.put('/users', async (req, res) => {         
           const user = req.body;
           const filter = {email: user.email};
+          let result = [];
           if(filter) {
-              const options = { upsert: true };
-              const updateDoc = { $set: user };
-              const result = await usersCollection.updateOne(filter, updateDoc, options);
-              res.json(result);
+            const options = { upsert: true };
+            const updateDoc = { $set: user };
+            const updateUser = await usersCollection.updateOne(filter, updateDoc, options);
+            result.push(updateUser);
           }
           else {
-            const result = await usersCollection.insertOne(user);
-            res.json(result); 
+            const newUser = await usersCollection.insertOne(user);
+            result.push(newUser)
           }
+        //   res.json(result); 
 
         });
 
@@ -139,14 +141,14 @@ async function run() {
         // Product Edit GET API ...
         app.get('/admins/product/edit/:id', async (req, res) => {
             const id = req.params.id;
-            const query = {_id: ObjectId(id)}
+            const query = {_id: ObjectId(id)};
             const product = await productsCollection.findOne(query);
-            // console.log(product[0]);
+            // // console.log(product[0]);
             res.json(product);
         });
 
         // Product Update PUT API ... 
-        app.put('/admin/product/update/:id', async (req, res) => {
+        app.put('/admins/product/update/:id', async (req, res) => {
             const id = req.params.id;
             const editFormData = req.body;
             const filter = {_id: ObjectId(id)};
@@ -167,7 +169,7 @@ async function run() {
                 }
             };
             const update = await productsCollection.updateOne(filter, updateDoc, options);
-            // console.log(update);
+            // // console.log(update);
             res.json(update);
         });
 
