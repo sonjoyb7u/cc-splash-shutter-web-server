@@ -87,13 +87,13 @@ async function run() {
         app.get('/users/:email', async (req, res) => {
             const email = req.params.email;
             const query = {email: email};
-            const findUser = await usersCollection.findOne(query);
+            const userRoleAdmin = await usersCollection.findOne(query);
             // console.log(findUser);
             // let isAdmin = false;
-            // if(findUser?.role === 'admin') {
+            // if(userRoleAdmin?.role === 'admin') {
             //     isAdmin = true;
             // }
-            res.json(findUser);
+            res.json(userRoleAdmin);
             // res.json({admin: isAdmin});
 
         });
@@ -264,14 +264,35 @@ async function run() {
             res.json(result);
         });
 
+        // Admin User Delete Review DELETE API ... 
+        app.delete('/admins/review/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const destroy = await reviewsCollection.deleteOne(query);
+            res.json(destroy);
+        });
+
+        // Home Page Read All Reviews(only display: show) GET API ... 
+        app.get("/reviews", async (req, res) => {
+            const reviews = await reviewsCollection.find({}).toArray();
+            let showDisplays = [];
+            reviews.map(review => {
+                if(review.display === "show") {
+                    showDisplays.push(review);
+                }
+            })
+            // console.log(showDisplays);
+            res.json(showDisplays);
+        });
+
         // =============================GUEST REVIEW CRUD==============================
 
-        // Guest User Read Order for Create Product review GET API ...
-        app.get('/user/order/:id', async (req, res) => {
-            const query = {_id: ObjectId(req.params.id)};
-            const order = await ordersCollection.findOne(query);
-            // console.log(order);
-            res.json(order)
+        // Gust User Read His Reviews GET API ...
+        app.get("/user/myReviews/:email", async (req, res) => {
+            // console.log(req.params.email);
+            const email = { email: req.params.email }
+            const result = await reviewsCollection.find(email).toArray();
+            res.json(result);
         });
 
         // Guest User Create Site Review POST API ...
@@ -281,12 +302,29 @@ async function run() {
             res.json(create);
         });
 
+        // Guest User Delete Review DELETE API ... 
+        app.delete('/user/review/delete/:id', async (req, res) => {
+            const id = req.params.id;
+            const query = { _id: ObjectId(id) };
+            const destroy = await ordersCollection.deleteOne(query);
+            res.json(destroy);
+        });
+
+
+        // Guest User Read Order for Create Product review GET API ...
+        app.get('/user/order/:id', async (req, res) => {
+            const query = {_id: ObjectId(req.params.id)};
+            const order = await ordersCollection.findOne(query);
+            res.json(order)
+        });
+
         // Guest User Create Product Wise Review POST API ...
         app.post('/user/product-review/create', async (req, res) => {
             const formData = req.body;
             const create = await productWiseReviewsCollection.insertOne(formData);
             res.json(create);
         });
+
 
 
 
