@@ -47,7 +47,6 @@ async function run() {
         app.get('/users', async (req, res) => {
             const query = {};
             const users = await usersCollection.find(query).toArray();
-            // console.log(users);
             res.json(users);
         })
 
@@ -230,7 +229,7 @@ async function run() {
 
         // =========================================GUEST ORDER CRUD================================
 
-        // Guest User Order Create POST API ...
+        // Home Page Guest User Order/Purchase Create POST API ...
         app.post('/user/order/create', async (req, res) => {
             const formData = req.body;
             const create = await ordersCollection.insertOne(formData);
@@ -284,7 +283,7 @@ async function run() {
         });
 
         // Home Page Read All Reviews(only display: show) GET API ... 
-        app.get("/reviews", async (req, res) => {
+        app.get("/home/reviews", async (req, res) => {
             const reviews = await reviewsCollection.find({}).toArray();
             let showDisplays = [];
             reviews.map(review => {
