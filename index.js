@@ -181,8 +181,17 @@ async function run() {
             res.json(destroy);
         });
 
-        // Show & Read Product Detail GET API ... 
-        app.get('/product-detail/:id', async (req, res) => {
+
+        // Home Page Show & Read All Products GET API ...
+        app.get('/home/products', async (req, res) => {
+            const query = {};
+            const products = await productsCollection.find(query).toArray();
+            // console.log(products);
+            res.json(products);
+        })
+
+        // Home Page Show & Read Product Detail GET API ... 
+        app.get('/home/product-detail/:id', async (req, res) => {
             const query = {_id: ObjectId(req.params.id)};
             const product = await productsCollection.findOne(query);
             // console.log(product);
